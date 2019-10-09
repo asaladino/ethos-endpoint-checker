@@ -37,7 +37,7 @@ To build the jar file for deployment you will need to have gradle installed
 
 1. Open cmd / powershell/ terminal
 2. Change directories to where you checked out the code: `./ethos-endpoint-checker-java`
-3. The run: `gradle clean build fatJar`
+3. The run: `gradle clean build`
 
 Your jar file has been generated and is located at `./build/libs/ethos-endpoint-checker-java.jar`
 
@@ -69,3 +69,7 @@ Found 275 in Colleague by Ellucian
 ❌ | account-funds-available-transactions             |    352 ms | java.lang.IllegalStateException: Expected BEGIN_ARRAY but was BEGIN_OBJECT at line 1 column 2 path $
 ✅ | accounting-codes                                 |   1490 ms | (127) [{"category":{"usage":"accountsReceivabl
 ```
+
+If no config file is specified or the `jar` file is double clicked, the GUI will open:
+
+![Ethos Endpoing Checker](./docs/gui.png)
