@@ -28,6 +28,9 @@ class MainView : View() {
             padding = box(5.px)
         }
         hbox {
+            vboxConstraints {
+                marginBottom = 5.0
+            }
             ethosApiKey = textfield {
                 hboxConstraints {
                     marginRight = 5.0

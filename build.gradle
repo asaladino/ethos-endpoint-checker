@@ -8,22 +8,38 @@ buildscript {
     }
 }
 
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+
+
 apply plugin: "kotlin"
 apply plugin: "application"
 
+mainClassName = 'com.ellucian.app.EthosCheckIt'
+
 group 'com.ellucian.app'
 version '1.5.0'
+
+javafx {
+    version = "12.0.2"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
 
 compileKotlin {
     kotlinOptions.jvmTarget= 1.8
 }
 
-task fatJar(type: Jar) {
+jar {
     manifest {
         attributes 'Main-Class': 'com.ellucian.app.EthosCheckIt'
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 repositories {
@@ -31,14 +47,14 @@ repositories {
 }
 
 dependencies {
-    compile 'com.squareup.okhttp3:okhttp:4.2.0'
-    compile 'com.google.code.gson:gson:2.8.5'
-    compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
-    compile group: 'joda-time', name: 'joda-time', version: '2.10'
+    implementation 'com.squareup.okhttp3:okhttp:4.2.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
+    implementation group: 'joda-time', name: 'joda-time', version: '2.10'
 
-    compile 'no.tornado:tornadofx:1.7.19'
+    implementation 'no.tornado:tornadofx:1.7.19'
 
-    compile 'org.apache.commons:commons-lang3:3.9'
+    implementation 'org.apache.commons:commons-lang3:3.9'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

@@ -13,6 +13,7 @@ import java.text.NumberFormat
 import java.util.concurrent.atomic.AtomicInteger
 
 import org.apache.commons.lang3.StringUtils
+import tornadofx.launch
 
 class EthosCheckIt {
     private val gson = Gson()
@@ -111,14 +112,18 @@ class EthosCheckIt {
         @JvmStatic
         fun main(args: Array<String>) {
             val ethosCheckIt = EthosCheckIt()
-            println("Starting")
+            if(args.isNotEmpty()) {
+                println("Starting")
 
-            ethosCheckIt.loadConfig(args[0])
-            ethosCheckIt.ethosAuth()
-            ethosCheckIt.retrieveEndpoints()
-            ethosCheckIt.checkingEndpoints()
+                ethosCheckIt.loadConfig(args[0])
+                ethosCheckIt.ethosAuth()
+                ethosCheckIt.retrieveEndpoints()
+                ethosCheckIt.checkingEndpoints()
 
-            println("Finished")
+                println("Finished")
+            } else {
+                launch<EthosCheckItGui>(args)
+            }
         }
     }
 }
