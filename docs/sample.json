@@ -1,0 +1,6 @@
+{
+  "ethosApiKey": "your ethos key",
+  "onlyCheck": [
+    "administrative-periods"
+  ]
+}
