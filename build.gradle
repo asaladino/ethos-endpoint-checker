@@ -21,7 +21,7 @@ apply plugin: "application"
 mainClassName = 'com.ellucian.app.EthosCheckIt'
 
 group 'com.ellucian.app'
-version '1.6.0'
+version '1.7.0'
 
 javafx {
     version = "12.0.2"

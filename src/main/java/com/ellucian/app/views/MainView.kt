@@ -4,13 +4,10 @@ import com.ellucian.app.models.Config
 import com.ellucian.app.models.Result
 import com.ellucian.app.repositories.EthosRepository
 import javafx.application.Platform
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.SimpleDoubleProperty
 import javafx.collections.FXCollections
-import javafx.scene.control.ProgressBar
-import javafx.scene.control.TableView
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.layout.Priority
+import javafx.scene.paint.Color
 import tornadofx.*
 import kotlin.concurrent.thread
 
@@ -27,6 +24,8 @@ class MainView : View() {
         style {
             padding = box(5.px)
         }
+        title = "Ethos Endpoint Checker"
+        prefWidth = 700.0
         hbox {
             vboxConstraints {
                 marginBottom = 5.0
@@ -41,19 +40,20 @@ class MainView : View() {
             }
             button("Scan") {
                 action {
+                    results.clear()
                     startScan()
                 }
             }
         }
         endpointsTableView = tableview(results) {
+            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
             vboxConstraints {
                 vGrow = Priority.ALWAYS
             }
-            column("[ ]", Result::successProperty).useCheckbox()
-            readonlyColumn("Resource", Result::resource)
-            readonlyColumn("Endpoint", Result::endpoint)
-            readonlyColumn("Time (ms)", Result::time)
-            readonlyColumn("Message", Result::message)
+            column("Resource", Result::successProperty).cellFormat { rowStatus<Boolean>(this, rowItem.resourceProperty.get()) }
+            column("Endpoint", Result::successProperty).cellFormat { rowStatus<Boolean>(this, rowItem.endpointProperty.get()) }
+            column("Time (ms)", Result::successProperty).cellFormat { rowStatus<Boolean>(this, rowItem.timeProperty.get().toString()) }
+            column("Message", Result::successProperty).cellFormat { rowStatus<Boolean>(this, rowItem.messageProperty.get()) }
         }
         hbox {
             vboxConstraints {
@@ -71,8 +71,22 @@ class MainView : View() {
         }
     }
 
+    private fun <T> rowStatus(tableCell: TableCell<Result, T>, value: String) {
+        tableCell.text = value
+        tableCell.style {
+            if (tableCell.rowItem.successProperty.get()) {
+                backgroundColor += Color.LIGHTGREEN
+                textFill = Color.BLACK
+            } else {
+                backgroundColor += Color.INDIANRED
+                textFill = Color.BLACK
+            }
+        }
+    }
+
     private fun startScan() {
         thread {
+            Platform.runLater { scanProgressBar?.progress = -1.0 }
             val config = Config(ethosApiKey?.text)
             val ethosRepository = EthosRepository(config)
             ethosRepository.ethosAuth()
@@ -89,25 +103,25 @@ class MainView : View() {
                 val startTime = System.nanoTime()
                 Platform.runLater {
                     endpointsTableView?.selectionModel?.select(it)
-                    endpointsTableView?.scrollTo(it)
+//                    endpointsTableView?.scrollTo(it)
                 }
                 try {
                     if (ethosRepository.didExpire()) {
                         ethosRepository.ethosAuth()
                     }
                     val checkResponse = ethosRepository.check(it.endpoint)
-                    Platform.runLater {
-                        it.time = (System.nanoTime() - startTime) / 1000000
-                        it.numberOf = checkResponse.model.size
-                        it.message = checkResponse.body
+//                    Platform.runLater {
+                        it.timeProperty.set((System.nanoTime() - startTime) / 1000000)
+                        it.numberOfProperty.set(checkResponse.model.size)
+                        it.messageProperty.set(checkResponse.body)
                         it.successProperty.set(true)
-                    }
+//                    }
                 } catch (e: Exception) {
-                    Platform.runLater {
-                        it.time = (System.nanoTime() - startTime) / 1000000
-                        it.message = e.message
+//                    Platform.runLater {
+                        it.timeProperty.set((System.nanoTime() - startTime) / 1000000)
+                        it.messageProperty.set(e.message)
                         it.successProperty.set(false)
-                    }
+//                    }
                 }
                 count++
                 Platform.runLater {
